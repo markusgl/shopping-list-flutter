@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
@@ -15,7 +16,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: ShoppingList(title: 'Shopping List'),
+      home: ShoppingList(title: 'Einkaufsliste'),
     );
   }
 }
@@ -35,28 +36,31 @@ class _ShoppingListState extends State<ShoppingList> {
   List<String> _completedItems = [];
   TextEditingController inputController = new TextEditingController();
 
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   _loadData();
-  // }
-  //
-  // void _loadData() async {
-  //   final prefs = await SharedPreferences.getInstance();
-  //   setState(() {
-  //     _items = prefs.getStringList("items") ?? [];
-  //     _completedItems = prefs.getStringList("completedItems") ?? [];
-  //   });
-  // }
+  @override
+  void initState() {
+    super.initState();
+    _loadData();
+  }
+
+  void _loadData() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _items = prefs.getStringList("items") ?? [];
+      _completedItems = prefs.getStringList("completedItems") ?? [];
+    });
+  }
 
   void _addItem() {
     String item = inputController.text;
-    // print("adding item " + item);
-    setState(() {
-      _items.add(item);
-      inputController.text = "";
-    });
-    // _saveData();
+    if (item.length > 0) {
+      setState(() {
+        _items.add(item);
+        inputController.text = "";
+      });
+      _saveData();
+    } else {
+      Fluttertoast.showToast(msg: "Bitte Artikel eingeben");
+    }
   }
 
   @override
@@ -64,6 +68,7 @@ class _ShoppingListState extends State<ShoppingList> {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
+        backgroundColor: Colors.lightBlue,
       ),
       body: Stack(
         fit: StackFit.loose,
@@ -89,8 +94,7 @@ class _ShoppingListState extends State<ShoppingList> {
                         autofocus: true,
                         decoration: InputDecoration(
                             labelText: "Artikel eingeben",
-                            hintText: "z. B. Bananen"
-                        ),
+                            hintText: "z. B. Bananen"),
                       ))
                     ],
                   ),
@@ -122,7 +126,7 @@ class _ShoppingListState extends State<ShoppingList> {
         itemCount: _items.length + _completedItems.length,
         itemBuilder: (context, index) {
           if (index < _items.length) {
-            return buildListItem(index,_items[index]);
+            return buildListItem(index, _items[index]);
           } else {
             int completedIndex = index - _items.length;
             return _buildCompletedListItem(
@@ -133,19 +137,17 @@ class _ShoppingListState extends State<ShoppingList> {
 
   Widget buildListItem(int itemIndex, String text) {
     return new ListTile(
-      title:
-          new Text(text, style: TextStyle(color: Colors.black, fontSize: 22)),
-      tileColor: Colors.black12,
-      onTap: () => _completeItem(itemIndex)
-    );
+        title:
+            new Text(text, style: TextStyle(color: Colors.black, fontSize: 22)),
+        tileColor: Colors.black12,
+        onTap: () => _completeItem(itemIndex));
   }
 
   Widget _buildCompletedListItem(int itemIndex, String text) {
     return new ListTile(
-      title: new Text(
-          text,
+      title: new Text(text,
           style: TextStyle(
-              color: Colors.black,
+              color: Colors.grey,
               fontSize: 22,
               decoration: TextDecoration.lineThrough)),
       tileColor: Colors.black12,
@@ -157,19 +159,19 @@ class _ShoppingListState extends State<ShoppingList> {
     setState(() {
       _completedItems.insert(0, _items.removeAt(index));
     });
-    // _saveData();
+    _saveData();
   }
 
   void _uncompleteItem(int index) {
     setState(() {
       _items.add(_completedItems.removeAt(index));
     });
-    // _saveData();
+    _saveData();
   }
 
-  // void _saveData() async {
-  //   final prefs = await SharedPreferences.getInstance();
-  //   prefs.setStringList("items", _items);
-  //   prefs.setStringList("completedItems", _completedItems);
-  // }
+  void _saveData() async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setStringList("items", _items);
+    prefs.setStringList("completedItems", _completedItems);
+  }
 }
