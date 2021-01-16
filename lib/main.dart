@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   runApp(MyApp());
@@ -14,7 +16,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: ShoppingList(title: 'Shopping List'),
+      home: ShoppingList(title: 'Einkaufsliste'),
     );
   }
 }
@@ -32,17 +34,33 @@ enum MenuActions { ClearSuggestions }
 class _ShoppingListState extends State<ShoppingList> {
   List<String> _items = [];
   List<String> _completedItems = [];
-  TextEditingController inputController = TextEditingController();
+  TextEditingController inputController = new TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _loadData();
+  }
+
+  void _loadData() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _items = prefs.getStringList("items") ?? [];
+      _completedItems = prefs.getStringList("completedItems") ?? [];
+    });
+  }
 
   void _addItem() {
     String item = inputController.text;
-    print("adding item " + item);
-    setState(() {
-      _items.add(item);
-      inputController.text = "";
-
-    });
-    // buildList();
+    if (item.length > 0) {
+      setState(() {
+        _items.add(item);
+        inputController.text = "";
+      });
+      _saveData();
+    } else {
+      Fluttertoast.showToast(msg: "Bitte Artikel eingeben");
+    }
   }
 
   @override
@@ -50,6 +68,7 @@ class _ShoppingListState extends State<ShoppingList> {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
+        backgroundColor: Colors.lightBlue,
       ),
       body: Stack(
         fit: StackFit.loose,
@@ -71,17 +90,15 @@ class _ShoppingListState extends State<ShoppingList> {
                     children: <Widget>[
                       new Expanded(
                           child: new TextField(
-                            controller: inputController,
-                            autofocus: true,
-                            decoration: InputDecoration(
-                                labelText: "Artikel eingeben",
-                                hintText: "z. B. Bananen"
-                            ),
-                          )
-                      )
+                        controller: inputController,
+                        autofocus: true,
+                        decoration: InputDecoration(
+                            labelText: "Artikel eingeben",
+                            hintText: "z. B. Bananen"),
+                      ))
                     ],
                   ),
-                  // content: Text(inputController.text)
+                  // content: Text(inputController.text),
                   actions: <Widget>[
                     new FlatButton(
                         child: new Text("Schließen"),
@@ -91,7 +108,7 @@ class _ShoppingListState extends State<ShoppingList> {
                     new FlatButton(
                       child: new Text("Speichern"),
                       onPressed: () {
-                        buildList();
+                        _addItem();
                         Navigator.of(context).pop();
                       },
                     )
@@ -104,21 +121,57 @@ class _ShoppingListState extends State<ShoppingList> {
     );
   }
 
-  ListView buildList() {
-    print("building list with item " + inputController.text);
+  Widget buildList() {
     return new ListView.builder(
-              itemCount: _items.length,
-              itemBuilder: (context, index) {
-                return buildListItem(inputController.text);
-              });
+        itemCount: _items.length + _completedItems.length,
+        itemBuilder: (context, index) {
+          if (index < _items.length) {
+            return buildListItem(index, _items[index]);
+          } else {
+            int completedIndex = index - _items.length;
+            return _buildCompletedListItem(
+                completedIndex, _completedItems[completedIndex]);
+          }
+        });
   }
 
-  Widget buildListItem(String text) {
+  Widget buildListItem(int itemIndex, String text) {
     return new ListTile(
-      // title: new Text(text, style: TextStyle(color: Colors.green, fontSize: 22)),
-      title: Text(text),
-      tileColor: Colors.green,
-      onTap: () => TextDecoration.lineThrough,
+        title:
+            new Text(text, style: TextStyle(color: Colors.black, fontSize: 22)),
+        tileColor: Colors.black12,
+        onTap: () => _completeItem(itemIndex));
+  }
+
+  Widget _buildCompletedListItem(int itemIndex, String text) {
+    return new ListTile(
+      title: new Text(text,
+          style: TextStyle(
+              color: Colors.grey,
+              fontSize: 22,
+              decoration: TextDecoration.lineThrough)),
+      tileColor: Colors.black12,
+      onTap: () => _uncompleteItem(itemIndex),
     );
+  }
+
+  void _completeItem(int index) {
+    setState(() {
+      _completedItems.insert(0, _items.removeAt(index));
+    });
+    _saveData();
+  }
+
+  void _uncompleteItem(int index) {
+    setState(() {
+      _items.add(_completedItems.removeAt(index));
+    });
+    _saveData();
+  }
+
+  void _saveData() async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setStringList("items", _items);
+    prefs.setStringList("completedItems", _completedItems);
   }
 }
