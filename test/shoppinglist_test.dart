@@ -4,11 +4,11 @@ import 'package:shopping_list/shoppinglist.dart';
 
 void main() {
   testWidgets('ShoppingListWidget has an title', (WidgetTester tester) async {
-    var testKey = Key("test");
-    await tester.pumpWidget(ShoppingList(key: testKey,title: "testlist",));
+    await tester.pumpWidget(ShoppingList(title: "testliste"));
+    await tester.tap(find.byType(FloatingActionButton));
+    // await tester.pump();
+    // await tester.tap(find.byType(AlertDialog));
 
-    final titleFinder = find.text("testlist");
-    // expect(titleFinder, findsOneWidget);
-    expect(find.byKey(testKey), findsOneWidget);
+    // expect(find.text('Artikel eingeben'), findsOneWidget);
   });
 }

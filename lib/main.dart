@@ -3,6 +3,7 @@ import 'package:shopping_list/shoppinglist.dart';
 
 void main() {
   runApp(MyApp());
+  // runApp(ShoppingList(title: 'Simple Checklist'));
 }
 
 class MyApp extends StatelessWidget {

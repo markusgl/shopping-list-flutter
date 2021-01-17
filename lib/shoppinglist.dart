@@ -94,6 +94,15 @@ class _ShoppingListState extends State<ShoppingList> {
           Container(
             child: buildList(),
           ),
+          Positioned(
+              bottom: 0.0,
+              width: MediaQuery.of(context).size.width,
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.white
+                ),
+              )
+          )
         ],
       ),
       floatingActionButton: FloatingActionButton(
