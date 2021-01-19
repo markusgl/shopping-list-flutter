@@ -2,11 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:shopping_list/shoppinglist.dart';
 
 void main() {
-  runApp(MyApp());
-  // runApp(ShoppingList(title: 'Simple Checklist'));
+  runApp(Home());
 }
 
-class MyApp extends StatelessWidget {
+class Home extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
