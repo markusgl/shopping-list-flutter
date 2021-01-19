@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -10,9 +12,25 @@ class ShoppingList extends StatefulWidget {
   _ShoppingListState createState() => _ShoppingListState();
 }
 
+class ListItem {
+  String text;
+  bool isChecked;
+  ListItem(this.text, this.isChecked);
+
+  @override
+  toString() {
+    return 'text: $text, isChecked: $isChecked';
+  }
+
+  Map<String, dynamic> toJson() => {
+    'text': this.text, 'isChecked': this.isChecked
+  };
+  factory ListItem.fromJson(Map<String, dynamic> listItem) =>
+      ListItem(listItem['text'], listItem['isChecked']);
+}
+
 class _ShoppingListState extends State<ShoppingList> {
-  List<String> _items = [];
-  List<String> _completedItems = [];
+  List<ListItem> _itemList = [];
   TextEditingController inputController = new TextEditingController();
 
   @override
@@ -21,19 +39,13 @@ class _ShoppingListState extends State<ShoppingList> {
     _loadData();
   }
 
-  void _loadData() async {
-    final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      _items = prefs.getStringList("items") ?? [];
-      _completedItems = prefs.getStringList("completedItems") ?? [];
-    });
-  }
-
   void _addItem() {
-    String item = inputController.text;
-    if (item.length > 0) {
+    String userInput = inputController.text;
+    ListItem listItem = new ListItem(inputController.text, false);
+
+    if (userInput.length > 0) {
       setState(() {
-        _items.add(item);
+        _itemList.add(listItem);
         inputController.text = "";
       });
       _saveData();
@@ -43,14 +55,21 @@ class _ShoppingListState extends State<ShoppingList> {
   }
 
   void _clearCompletedItems() {
-    if (_completedItems.length > 0) {
+    if (_itemList.where((item) => item.isChecked).length > 0){
       setState(() {
-        _completedItems.clear();
+        _itemList.removeWhere((item) => item.isChecked);
       });
       _saveData();
     } else {
       Fluttertoast.showToast(msg: "Keine erledigten Artikel vorhanden");
     }
+  }
+
+  void _clearAllItems() {
+    setState(() {
+      _itemList.clear();
+    });
+    _saveData();
   }
 
   @override
@@ -62,29 +81,11 @@ class _ShoppingListState extends State<ShoppingList> {
         actions: <Widget>[
           IconButton(
               icon: Icon(Icons.delete_outline),
-              onPressed: () {
-                showDialog(
-                    context: context,
-                    builder: (BuildContext buildContext) {
-                      return AlertDialog(
-                        title: new Text("Alle erledigten Artikel löschen?"),
-                        actions: <Widget>[
-                          new FlatButton(
-                              onPressed: () {
-                                _clearCompletedItems();
-                                Navigator.of(context).pop();
-                              },
-                              child: new Text('Ja')
-                          ),
-                          new FlatButton(
-                              onPressed: Navigator.of(context).pop,
-                              child: new Text('Nein')
-                          )
-                        ],
-                      );
-                    }
-                );
-              }
+              onPressed: () => _itemList.where((item) => item.isChecked).length > 0 ? _showAlertDialogForCompletedItems(context) : Fluttertoast.showToast(msg: "Keine erledigten Artikel vorhanden"),
+          ),
+          IconButton(
+              icon: Icon(Icons.delete),
+              onPressed: () => _itemList.length > 0 ? _showAlertDialogForAllItems(context) : Fluttertoast.showToast(msg: "Keine Artikel vorhanden"),
           )
         ],
       ),
@@ -112,7 +113,6 @@ class _ShoppingListState extends State<ShoppingList> {
               context: context,
               builder: (BuildContext buildContext) {
                 return AlertDialog(
-                  // title: new Text("hello"),
                   content: new Row(
                     children: <Widget>[
                       new Expanded(
@@ -149,57 +149,91 @@ class _ShoppingListState extends State<ShoppingList> {
     );
   }
 
+  void _showAlertDialogForCompletedItems(BuildContext context) {
+     showDialog(
+        context: context,
+        builder: (BuildContext buildContext) {
+          return AlertDialog(
+            title: new Text("Alle erledigten Artikel löschen?"),
+            actions: <Widget>[
+              new FlatButton(
+                  onPressed: () {
+                    _clearCompletedItems();
+                    Navigator.of(context).pop();
+                  },
+                  child: new Text('Ja')
+              ),
+              new FlatButton(
+                  onPressed: Navigator.of(context).pop,
+                  child: new Text('Nein')
+              )
+            ],
+          );
+        }
+    );
+  }
+
+  void _showAlertDialogForAllItems(BuildContext context) {
+     showDialog(
+        context: context,
+        builder: (BuildContext buildContext) {
+          return AlertDialog(
+            title: new Text("Alle Artikel löschen?"),
+            actions: <Widget>[
+              new FlatButton(
+                  onPressed: () {
+                    _clearAllItems();
+                    Navigator.of(context).pop();
+                  },
+                  child: new Text('Ja')
+              ),
+              new FlatButton(
+                  onPressed: Navigator.of(context).pop,
+                  child: new Text('Nein')
+              )
+            ],
+          );
+        }
+    );
+  }
+
   Widget buildList() {
     return new ListView.builder(
-        itemCount: _items.length + _completedItems.length,
+        itemCount: _itemList.length,
         itemBuilder: (context, index) {
-          if (index < _items.length) {
-            return buildListItem(index, _items[index]);
-          } else {
-            int completedIndex = index - _items.length;
-            return _buildCompletedListItem(
-                completedIndex, _completedItems[completedIndex]);
-          }
+          return buildListItem(index, _itemList[index].text);
         });
   }
 
   Widget buildListItem(int itemIndex, String text) {
     return new ListTile(
-        title:
-        new Text(text, style: TextStyle(color: Colors.black, fontSize: 22)),
+        title: new Text(
+            text,
+            style: TextStyle(
+                color: _itemList[itemIndex].isChecked ? Colors.black12 : Colors.black,
+                fontSize: 22,
+                decoration: _itemList[itemIndex].isChecked ? TextDecoration.lineThrough : TextDecoration.none)),
         tileColor: Colors.black12,
-        onTap: () => _completeItem(itemIndex));
-  }
-
-  Widget _buildCompletedListItem(int itemIndex, String text) {
-    return new ListTile(
-      title: new Text(text,
-          style: TextStyle(
-              color: Colors.grey,
-              fontSize: 22,
-              decoration: TextDecoration.lineThrough)),
-      tileColor: Colors.black12,
-      onTap: () => _uncompleteItem(itemIndex),
+        onTap: () => setState(() {
+          _itemList[itemIndex].isChecked = !_itemList[itemIndex].isChecked;
+          _saveData();
+        })
     );
-  }
-
-  void _completeItem(int index) {
-    setState(() {
-      _completedItems.insert(0, _items.removeAt(index));
-    });
-    _saveData();
-  }
-
-  void _uncompleteItem(int index) {
-    setState(() {
-      _items.add(_completedItems.removeAt(index));
-    });
-    _saveData();
   }
 
   void _saveData() async {
     final prefs = await SharedPreferences.getInstance();
-    prefs.setStringList("items", _items);
-    prefs.setStringList("completedItems", _completedItems);
+    prefs.setString('itemList', json.encode(_itemList));
+  }
+
+  void _loadData() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      // workaround because SharedPreferences can only store Lists of type String
+      String storedItems = prefs.getString("itemList");
+      if(storedItems?.isEmpty ?? true) return <ListItem>[];
+      final items = json.decode(storedItems) as List;
+      _itemList = List<ListItem>.from(items.map((x) => ListItem.fromJson(x)));
+    });
   }
 }
