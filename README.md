@@ -3,8 +3,7 @@
 A simple shopping list written in flutter
 
 ## Screenshots
-![overview](./screenshots/overview.png | width=100)
-![add_item](./screenshots/add_item.png | width=100)
+![overview](./screenshots/simple_shoppinglist.jpg)
 
 ## Building
 Tested only on Android yet
