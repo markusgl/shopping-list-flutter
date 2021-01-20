@@ -10,7 +10,7 @@ class Home extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Shopping List',
+      title: 'Einkaufsliste',
       theme: ThemeData(
         primarySwatch: Colors.lightGreen,
         primaryIconTheme: IconThemeData(
@@ -23,7 +23,7 @@ class Home extends StatelessWidget {
         ),
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: ShoppingList(title: 'Easy Shopping List'),
+      home: ShoppingList(title: 'Einkaufsliste'),
     );
   }
 }
