@@ -17,6 +17,7 @@ class ShoppingList extends StatefulWidget {
 class _ShoppingListState extends State<ShoppingList> {
   List<ListItem> _itemList = [];
   TextEditingController inputController = new TextEditingController();
+  double _fontSize = 22;
 
   @override
   void initState() {
@@ -57,6 +58,13 @@ class _ShoppingListState extends State<ShoppingList> {
     _saveData();
   }
 
+  void _completeAllItems() {
+    setState(() {
+      _itemList.map((item) => item.isChecked=!item.isChecked).toList();
+    });
+    _saveData();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -65,15 +73,27 @@ class _ShoppingListState extends State<ShoppingList> {
         backgroundColor: Colors.lightBlue,
         actions: <Widget>[
           IconButton(
+            key: Key("font_size"),
+            icon: Icon(Icons.format_size),
+            onPressed: () => setState(() {
+              _fontSize==22 ? _fontSize=18 : _fontSize=22;
+            }),
+          ),
+          IconButton(
+            key: Key("set_complete"),
+            icon: Icon(Icons.check),
+            onPressed: () => _completeAllItems(),
+          ),
+          IconButton(
               key: Key("delete_completed"),
-              icon: Icon(Icons.delete_outline),
+              icon: Icon(Icons.remove_done),
               onPressed: () => _itemList.where((item) => item.isChecked).length > 0
                   ? _showDialogForDeletingCompletedItems(context)
                   : Fluttertoast.showToast(msg: "Keine erledigten Artikel vorhanden"),
           ),
           IconButton(
               key: Key("delete_all"),
-              icon: Icon(Icons.delete_forever),
+              icon: Icon(Icons.delete_forever_outlined),
               onPressed: () => _itemList.length > 0
                   ? _showAlertDialogForDeletingAllItems(context)
                   : Fluttertoast.showToast(msg: "Keine Artikel vorhanden"),
@@ -175,7 +195,7 @@ class _ShoppingListState extends State<ShoppingList> {
         builder: (BuildContext buildContext) {
           return AlertDialog(
             key: Key("delete_all_dialog"),
-            title: new Text("Alle Artikel löschen?"),
+            title: new Text("Liste leeren?"),
             actions: <Widget>[
               new FlatButton(
                   key: Key("confirm"),
@@ -210,7 +230,7 @@ class _ShoppingListState extends State<ShoppingList> {
             text,
             style: TextStyle(
                 color: _itemList[itemIndex].isChecked ? Colors.black12 : Colors.black,
-                fontSize: 22,
+                fontSize: _fontSize,
                 decoration: _itemList[itemIndex].isChecked ? TextDecoration.lineThrough : TextDecoration.none)),
         tileColor: Colors.black12,
         onTap: () => setState(() {

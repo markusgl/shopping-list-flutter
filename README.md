@@ -1,6 +1,6 @@
-# Simple Shopping list / Check list
+# Simple Shoppinglist / Checklist
 
-A simple shopping list written in flutter
+A simple shopping list written with flutter
 
 ## Screenshots
 ![overview](./screenshots/simple_shoppinglist.jpg)
@@ -8,4 +8,4 @@ A simple shopping list written in flutter
 ## Building
 Tested only on Android yet
 
-```flutter build apk```
+Building APK: `flutter build apk`
