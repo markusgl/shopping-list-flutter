@@ -1,11 +1,11 @@
-# Simple Shopping list / Check list
+# Easy Shopping List
 
-A simple shopping list written in flutter
+A simple and easy to use shopping list written with flutter.
 
 ## Screenshots
-![overview](./screenshots/simple_shoppinglist.jpg)
+![overview](./screenshots/easy_shoppinglist.jpg)
 
 ## Building
 Tested only on Android yet
 
-```flutter build apk```
+Build APK: `flutter build apk`

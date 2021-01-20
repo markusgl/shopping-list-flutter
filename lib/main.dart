@@ -12,10 +12,18 @@ class Home extends StatelessWidget {
     return MaterialApp(
       title: 'Shopping List',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        primarySwatch: Colors.lightGreen,
+        primaryIconTheme: IconThemeData(
+          color: Colors.white
+        ),
+        primaryTextTheme: TextTheme(
+          headline6: TextStyle(
+            color: Colors.white
+          )
+        ),
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: ShoppingList(title: 'Simple Checklist'),
+      home: ShoppingList(title: 'Easy Shopping List'),
     );
   }
 }

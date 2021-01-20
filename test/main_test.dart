@@ -81,7 +81,7 @@ void main() {
 
   testWidgets('Remove Completed Items does not show dialog if no completed items are present', (WidgetTester tester) async {
     await tester.pumpWidget(Home());
-    await tester.tap(find.byIcon(Icons.delete_outline));
+    await tester.tap(find.byKey(Key("delete_completed")));
     await tester.pump();
 
     expect(find.byType(AlertDialog), findsNothing);
@@ -89,7 +89,7 @@ void main() {
 
   testWidgets('Remove All Items button does not show dialog if no completed items are present', (WidgetTester tester) async {
     await tester.pumpWidget(Home());
-    await tester.tap(find.byIcon(Icons.delete_forever));
+    await tester.tap(find.byKey(Key("delete_all")));
     await tester.pump();
 
     expect(find.byType(AlertDialog), findsNothing);
