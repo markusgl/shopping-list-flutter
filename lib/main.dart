@@ -23,7 +23,7 @@ class Home extends StatelessWidget {
         ),
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: ShoppingList(title: 'Easy Shoppinglist'),
+      home: ShoppingList(title: 'Easy Shopping List'),
     );
   }
 }
