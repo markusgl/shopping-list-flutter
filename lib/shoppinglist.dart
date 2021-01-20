@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -60,7 +61,7 @@ class _ShoppingListState extends State<ShoppingList> {
 
   void _completeAllItems() {
     setState(() {
-      _itemList.map((item) => item.isChecked=!item.isChecked).toList();
+      _itemList.map((item) => item.isChecked=true).toList();
     });
     _saveData();
   }
@@ -70,19 +71,19 @@ class _ShoppingListState extends State<ShoppingList> {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
-        backgroundColor: Colors.lightBlue,
+        // backgroundColor: Colors.lightGreen,
         actions: <Widget>[
           IconButton(
             key: Key("font_size"),
             icon: Icon(Icons.format_size),
             onPressed: () => setState(() {
-              _fontSize==22 ? _fontSize=18 : _fontSize=22;
+              _fontSize==22 ? _fontSize=28 : _fontSize=22;
             }),
           ),
           IconButton(
             key: Key("set_complete"),
             icon: Icon(Icons.check),
-            onPressed: () => _completeAllItems(),
+            onPressed: () => _showDialogForCompletingAllItems(context),
           ),
           IconButton(
               key: Key("delete_completed"),
@@ -105,21 +106,12 @@ class _ShoppingListState extends State<ShoppingList> {
         children: <Widget>[
           Container(
             child: buildList(),
-          ),
-          Positioned(
-              bottom: 0.0,
-              width: MediaQuery.of(context).size.width,
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.white
-                ),
-              )
           )
         ],
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () =>  showDialogForAddingItems(context),
-        child: Icon(Icons.add),
+        child: Icon(Icons.add, color: Colors.white),
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
@@ -160,6 +152,33 @@ class _ShoppingListState extends State<ShoppingList> {
             ],
           );
         });
+  }
+
+  void _showDialogForCompletingAllItems(BuildContext context) {
+     showDialog(
+        context: context,
+        builder: (BuildContext buildContext) {
+          return AlertDialog(
+            key: Key("delete_completed_dialog"),
+            title: new Text("Alle Artikel als erledigt markieren?"),
+            actions: <Widget>[
+              new FlatButton(
+                  key: Key("confirm"),
+                  onPressed: () {
+                    _completeAllItems();
+                    Navigator.of(context).pop();
+                  },
+                  child: new Text('Ja')
+              ),
+              new FlatButton(
+                  key: Key("deny"),
+                  onPressed: Navigator.of(context).pop,
+                  child: new Text('Nein')
+              )
+            ],
+          );
+        }
+    );
   }
 
   void _showDialogForDeletingCompletedItems(BuildContext context) {
