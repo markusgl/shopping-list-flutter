@@ -19,9 +19,12 @@ class ShoppingList extends StatefulWidget {
 class _ShoppingListState extends State<ShoppingList> {
   static const double _SMALL_FONT_SIZE = 28;
   static const double _LARGE_FONT_SIZE = 40;
+  static const double _SMALL_ITEM_EXTENT = 35;
+  static const double _LARGE_ITEM_EXTENT = 50;
   List<ListItem> _itemList = [];
   TextEditingController inputController = new TextEditingController();
   double _fontSize = _LARGE_FONT_SIZE;
+  double _itemExtent = _LARGE_ITEM_EXTENT;
 
   @override
   void initState() {
@@ -82,6 +85,7 @@ class _ShoppingListState extends State<ShoppingList> {
             icon: Icon(Icons.format_size),
             onPressed: () => setState(() {
               _fontSize==_LARGE_FONT_SIZE ? _fontSize=_SMALL_FONT_SIZE : _fontSize=_LARGE_FONT_SIZE;
+              _itemExtent==_LARGE_ITEM_EXTENT ? _itemExtent=_SMALL_ITEM_EXTENT : _itemExtent=_LARGE_ITEM_EXTENT;
             }),
           ),
           // IconButton(
@@ -202,6 +206,7 @@ class _ShoppingListState extends State<ShoppingList> {
   Widget buildList() {
     return new ListView.builder(
         itemCount: _itemList.length,
+        itemExtent: _itemExtent,
         itemBuilder: (context, index) {
           return buildListItem(index, _itemList[index].text);
         });
