@@ -119,6 +119,7 @@ class _ShoppingListState extends State<ShoppingList> {
         ],
       ),
       floatingActionButton: FloatingActionButton(
+        backgroundColor: Color.fromARGB(255, 85, 196, 180),
         onPressed: () =>  showDialogForAddingItems(context),
         child: Icon(Icons.add, color: Colors.white),
       ), // This trailing comma makes auto-formatting nicer for build methods.
@@ -147,12 +148,14 @@ class _ShoppingListState extends State<ShoppingList> {
               new FlatButton(
                   key: Key("close_dialog"),
                   child: new Text("Schließen"),
+                  textColor: Color.fromARGB(255, 85, 196, 180),
                   onPressed: () {
                     Navigator.of(context).pop();
                   }),
               new FlatButton(
                 key: Key("save_item"),
                 child: new Text("Speichern"),
+                textColor: Color.fromARGB(255, 85, 196, 180),
                 onPressed: () {
                   _addItem();
                   Navigator.of(context).pop();
