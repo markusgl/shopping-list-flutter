@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:shopping_list/shoppinglist.dart';
+import 'package:shopping_list/shoppeyapp.dart';
 
 void main() {
   runApp(Home());
@@ -28,7 +28,7 @@ class Home extends StatelessWidget {
         ),
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: ShoppingList(
+      home: ShoppeyApp(
           title: 'Shoppey'
       ),
     );

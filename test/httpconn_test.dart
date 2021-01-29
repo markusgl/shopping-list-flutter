@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:shopping_list/httpconn.dart';
@@ -28,12 +29,14 @@ void main() {
         "Joghurt"
       ]
     });
-    var result = client.getList('6013f7dae6cc344cec2b4606');
+    var result = client.getList('601454bee471ee4fbc0ae1cd');
+    print(result);
     // expect(result, expectedResult);
   });
 
   test('send a post request', () {
     final client = HttpConn();
-    client.saveNewList("blub", ["Tomaten", "Gurke"]);
+    var result = client.createNewList("blub", ["Tomaten", "Gurke"]);
+    print(result);
   });
 }

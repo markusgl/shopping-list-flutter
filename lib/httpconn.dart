@@ -1,38 +1,38 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:http/http.dart' as http;
+import 'package:shopping_list/shoppinglist.dart';
 
 class HttpConn {
   HttpClient client = new HttpClient();
   String baseUri = 'http://localhost:3000/api';
 
-  void getList(docId) {
-    print('sending request to ' + "http://localhost:3000/api/get-list/${docId}");
-    client
-        .getUrl(Uri.parse("$baseUri/get-list/$docId"))
-        .then((HttpClientRequest request) {
-          return request.close();
-        })
-        .then((HttpClientResponse response) {
-          print(response);
-          return response;
-    });
+  Future<ShoppingList> getList(docId) async {
+    final response = await http.get("$baseUri/get-list/$docId");
+    if (response.statusCode == 200) {
+      return ShoppingList.fromJson(jsonDecode(response.body));
+    } else {
+      throw Exception('Failed to load list');
+    }
   }
 
-  Future<String> saveNewList(String title, List<String> items) async {
-    Map<String, dynamic> jsonMap = {
-      'name': title,
-      'items': items
-    };
-    print(json.encode(jsonMap));
-    HttpClientRequest request = await client.postUrl(Uri.parse("$baseUri/create-list"));
-    // request.headers.set('content-type', 'application/json');
-    // request.add(jsonMap); // TODO set body
-
-
-    HttpClientResponse response = await request.close();
-    String reply = await response.transform(utf8.decoder).join();
-    client.close();
-    return reply;
+  Future<ShoppingList> createNewList(String title, List<String> items) async {
+    final http.Response response = await http.post(
+      this.baseUri+'/create-list',
+      headers: <String, String>{
+        'Content-Type': 'application/json',
+        'Accept': '*/*'
+      },
+      body: jsonEncode(<String, dynamic> {
+        'name': title,
+        'items': items,
+      }),
+    );
+    if (response.statusCode == 201) {
+      return ShoppingList.fromJson(jsonDecode(response.body));
+    } else {
+      throw Exception('Saving list failed');
+    }
   }
 
   void updateList(){
