@@ -9,7 +9,9 @@ class HttpConn {
 
   Future<ShoppingList> getList(docId) async {
     final response = await http.get("$baseUri/get-list/$docId");
+
     if (response.statusCode == 200) {
+      print(response.body);
       return ShoppingList.fromJson(jsonDecode(response.body));
     } else {
       throw Exception('Failed to load list');

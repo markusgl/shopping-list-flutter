@@ -28,12 +28,12 @@ class _ShoppeyAppState extends State<ShoppeyApp> {
   TextEditingController inputController = new TextEditingController();
   double _fontSize = _LARGE_FONT_SIZE;
   double _itemExtent = _LARGE_ITEM_EXTENT;
-  HttpConn httpConn = new HttpConn();
+  final client = HttpConn();
 
   @override
   void initState() {
     super.initState();
-    // futureShoppingList = httpConn.getList("601454bee471ee4fbc0ae1cd");
+    futureShoppingList = client.getList("601454bee471ee4fbc0ae1cd");
     _loadData();
   }
 

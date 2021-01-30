@@ -1,7 +1,7 @@
 class ShoppingList {
   final String id;
   final String name;
-  final List<String> items;
+  final List<dynamic> items;
 
   ShoppingList({this.id, this.name, this.items});
 

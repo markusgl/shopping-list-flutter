@@ -78,7 +78,6 @@ void main() {
     expect(find.text('Äpfel'), findsOneWidget);
   });
 
-
   testWidgets('Remove Completed Items does not show dialog if no completed items are present', (WidgetTester tester) async {
     await tester.pumpWidget(Home());
     await tester.tap(find.byKey(Key("delete_completed")));
@@ -94,5 +93,4 @@ void main() {
 
     expect(find.byType(AlertDialog), findsNothing);
   });
-
 }
