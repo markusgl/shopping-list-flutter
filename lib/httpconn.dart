@@ -1,14 +1,12 @@
 import 'dart:convert';
-import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:shopping_list/shoppinglist.dart';
 
 class HttpConn {
-  HttpClient client = new HttpClient();
   String baseUri = 'http://localhost:3000/api';
 
-  Future<ShoppingList> getList(docId) async {
-    final response = await http.get("$baseUri/get-list/$docId");
+  Future<ShoppingList> getList(docId, http.Client client) async {
+    final response = await client.get("$baseUri/get-list/$docId");
 
     if (response.statusCode == 200) {
       print(response.body);
