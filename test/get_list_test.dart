@@ -10,7 +10,7 @@ class MockClient extends Mock implements http.Client {}
 
 main() {
   group('getList', () {
-    test('http client sends a get request', () async {
+    test('http client sends a get request and ShoppingList is returned', () async {
       final httpConn = HttpConn();
       final mockClient = MockClient();
       final docId = '6013f7dae6cc344cec2b4606';
