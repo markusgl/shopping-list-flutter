@@ -65,13 +65,6 @@ class _ShoppeyAppState extends State<ShoppeyApp> {
     _saveData();
   }
 
-  void _completeAllItems() {
-    setState(() {
-      _itemList.map((item) => item.isChecked=true).toList();
-    });
-    _saveData();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Container(decoration: BoxDecoration(image: DecorationImage(image: new AssetImage("images/ruled_paper.png"), fit: BoxFit.cover)),child: Scaffold(
@@ -88,11 +81,6 @@ class _ShoppeyAppState extends State<ShoppeyApp> {
               _itemExtent==_LARGE_ITEM_EXTENT ? _itemExtent=_SMALL_ITEM_EXTENT : _itemExtent=_LARGE_ITEM_EXTENT;
             }),
           ),
-          // IconButton(
-          //   key: Key("set_complete"),
-          //   icon: Icon(Icons.check),
-          //   onPressed: () => _showDialogForCompletingAllItems(context),
-          // ),
           IconButton(
               key: Key("delete_completed"),
               color: Colors.redAccent,
