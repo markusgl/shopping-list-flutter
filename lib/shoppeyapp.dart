@@ -181,8 +181,6 @@ class _ShoppeyAppState extends State<ShoppeyApp> {
                   child: new Text("Schließen"),
                   textColor: Color.fromARGB(255, 85, 196, 180),
                   onPressed: () {
-                    // inputController.dispose();
-                    // super.dispose();
                     Navigator.of(context).pop();
                   }),
               new FlatButton(
