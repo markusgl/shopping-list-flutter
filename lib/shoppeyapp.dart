@@ -155,6 +155,50 @@ class _ShoppeyAppState extends State<ShoppeyApp> {
         });
   }
 
+  void showDialogForEditingItems(BuildContext context, ShoppingItem item, int index) {
+    inputController.text = item.text;
+    showDialog(
+        context: context,
+        builder: (BuildContext buildContext) {
+          return AlertDialog(
+            content: new Row(
+              children: <Widget>[
+                new Expanded(
+                    child: new TextField(
+                      // controller: new TextEditingController(text: item.text),
+                      controller: inputController,
+                      autofocus: true,
+                      onSubmitted: (dynamic x) => {_editItem(item, index), Navigator.of(context).pop()},
+                      decoration: InputDecoration(
+                          labelText: "Artikel eingeben",
+                          hintText: "z. B. Bananen"),
+                    ))
+              ],
+            ),
+            actions: <Widget>[
+              new FlatButton(
+                  key: Key("close_dialog"),
+                  child: new Text("Schließen"),
+                  textColor: Color.fromARGB(255, 85, 196, 180),
+                  onPressed: () {
+                    // inputController.dispose();
+                    // super.dispose();
+                    Navigator.of(context).pop();
+                  }),
+              new FlatButton(
+                key: Key("save_item"),
+                child: new Text("Speichern"),
+                textColor: Color.fromARGB(255, 85, 196, 180),
+                onPressed: () {
+                  _editItem(item, index);
+                  Navigator.of(context).pop();
+                },
+              )
+            ],
+          );
+        });
+  }
+
   void _showDialogForDeletingCompletedItems(BuildContext context) {
      showDialog(
         context: context,
@@ -219,10 +263,22 @@ class _ShoppeyAppState extends State<ShoppeyApp> {
           _itemList[itemIndex].isChecked = !_itemList[itemIndex].isChecked;
           _saveData();
         }),
-      onLongPress: () => setState((){
-        // TODO
-      }),
+      onLongPress: () => showDialogForEditingItems(context, _itemList[itemIndex], itemIndex),
     );
+  }
+
+  void _editItem(ShoppingItem item, int index) async {
+    String userInput = inputController.text;
+
+    if (userInput.length > 0) {
+      setState(() {
+        item.text = userInput;
+        inputController.text = "";
+      });
+      _saveData();
+    } else {
+      Fluttertoast.showToast(msg: "Keinen Artikel angegeben");
+    }
   }
 
   void _saveData() async {
