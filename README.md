@@ -3,7 +3,7 @@
 A simple and easy to use shopping list written with flutter.
 
 ## Screenshots
-![overview](./screenshots/easy_shoppinglist.jpg)
+![overview](./screenshots/shoppey.jpg)
 
 ## Building
 Tested only on Android yet

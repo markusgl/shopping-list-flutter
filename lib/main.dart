@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:shopping_list/shoppinglist.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:shopping_list/shoppeyapp.dart';
 
 void main() {
   runApp(Home());
@@ -10,20 +11,26 @@ class Home extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Einkaufsliste',
+      title: 'Shoppey',
       theme: ThemeData(
-        primarySwatch: Colors.lightGreen,
+        // primarySwatch: Colors.teal,  // Material color
+        primaryColor: Color.fromARGB(255, 85, 196, 180),
         primaryIconTheme: IconThemeData(
-          color: Colors.white
+          color: Colors.white // Icons in heading color
         ),
         primaryTextTheme: TextTheme(
           headline6: TextStyle(
-            color: Colors.white
+            fontFamily: GoogleFonts.caveat().fontFamily,
+            fontSize: 36,
+            // fontWeight: FontWeight.bold,
+            color: Colors.white  // Heading color
           )
         ),
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: ShoppingList(title: 'Einkaufsliste'),
+      home: ShoppeyApp(
+          title: 'Shoppey'
+      ),
     );
   }
 }

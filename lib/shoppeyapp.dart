@@ -3,22 +3,28 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:shopping_list/shoppingitem.dart';
 
-import 'listitem.dart';
 
-class ShoppingList extends StatefulWidget {
-  ShoppingList({Key key, this.title}) : super(key: key);
+class ShoppeyApp extends StatefulWidget {
+  ShoppeyApp({Key key, this.title}) : super(key: key);
   final String title;
 
   @override
-  _ShoppingListState createState() => _ShoppingListState();
+  _ShoppeyAppState createState() => _ShoppeyAppState();
 }
 
-class _ShoppingListState extends State<ShoppingList> {
-  List<ListItem> _itemList = [];
+class _ShoppeyAppState extends State<ShoppeyApp> {
+  static const double _SMALL_FONT_SIZE = 28;
+  static const double _LARGE_FONT_SIZE = 40;
+  static const double _SMALL_ITEM_EXTENT = 35;
+  static const double _LARGE_ITEM_EXTENT = 50;
+  List<ShoppingItem> _itemList = [];
   TextEditingController inputController = new TextEditingController();
-  double _fontSize = 22;
+  double _fontSize = _LARGE_FONT_SIZE;
+  double _itemExtent = _LARGE_ITEM_EXTENT;
 
   @override
   void initState() {
@@ -28,7 +34,7 @@ class _ShoppingListState extends State<ShoppingList> {
 
   void _addItem() {
     String userInput = inputController.text;
-    ListItem listItem = new ListItem(inputController.text, false);
+    ShoppingItem listItem = new ShoppingItem(inputController.text, false);
 
     if (userInput.length > 0) {
       setState(() {
@@ -68,7 +74,8 @@ class _ShoppingListState extends State<ShoppingList> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return Container(decoration: BoxDecoration(image: DecorationImage(image: new AssetImage("images/ruled_paper.png"), fit: BoxFit.cover)),child: Scaffold(
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
         title: Text(widget.title),
         // backgroundColor: Colors.lightGreen,
@@ -77,16 +84,18 @@ class _ShoppingListState extends State<ShoppingList> {
             key: Key("font_size"),
             icon: Icon(Icons.format_size),
             onPressed: () => setState(() {
-              _fontSize==22 ? _fontSize=28 : _fontSize=22;
+              _fontSize==_LARGE_FONT_SIZE ? _fontSize=_SMALL_FONT_SIZE : _fontSize=_LARGE_FONT_SIZE;
+              _itemExtent==_LARGE_ITEM_EXTENT ? _itemExtent=_SMALL_ITEM_EXTENT : _itemExtent=_LARGE_ITEM_EXTENT;
             }),
           ),
-          IconButton(
-            key: Key("set_complete"),
-            icon: Icon(Icons.check),
-            onPressed: () => _showDialogForCompletingAllItems(context),
-          ),
+          // IconButton(
+          //   key: Key("set_complete"),
+          //   icon: Icon(Icons.check),
+          //   onPressed: () => _showDialogForCompletingAllItems(context),
+          // ),
           IconButton(
               key: Key("delete_completed"),
+              color: Colors.redAccent,
               icon: Icon(Icons.remove_done),
               onPressed: () => _itemList.where((item) => item.isChecked).length > 0
                   ? _showDialogForDeletingCompletedItems(context)
@@ -94,6 +103,7 @@ class _ShoppingListState extends State<ShoppingList> {
           ),
           IconButton(
               key: Key("delete_all"),
+              color: Colors.redAccent,
               icon: Icon(Icons.delete_forever_outlined),
               onPressed: () => _itemList.length > 0
                   ? _showAlertDialogForDeletingAllItems(context)
@@ -110,10 +120,11 @@ class _ShoppingListState extends State<ShoppingList> {
         ],
       ),
       floatingActionButton: FloatingActionButton(
+        backgroundColor: Color.fromARGB(255, 85, 196, 180),
         onPressed: () =>  showDialogForAddingItems(context),
         child: Icon(Icons.add, color: Colors.white),
       ), // This trailing comma makes auto-formatting nicer for build methods.
-    );
+    ));
   }
 
   void showDialogForAddingItems(BuildContext context) {
@@ -138,12 +149,14 @@ class _ShoppingListState extends State<ShoppingList> {
               new FlatButton(
                   key: Key("close_dialog"),
                   child: new Text("Schließen"),
+                  textColor: Color.fromARGB(255, 85, 196, 180),
                   onPressed: () {
                     Navigator.of(context).pop();
                   }),
               new FlatButton(
                 key: Key("save_item"),
                 child: new Text("Speichern"),
+                textColor: Color.fromARGB(255, 85, 196, 180),
                 onPressed: () {
                   _addItem();
                   Navigator.of(context).pop();
@@ -154,56 +167,11 @@ class _ShoppingListState extends State<ShoppingList> {
         });
   }
 
-  void _showDialogForCompletingAllItems(BuildContext context) {
-     showDialog(
-        context: context,
-        builder: (BuildContext buildContext) {
-          return AlertDialog(
-            key: Key("delete_completed_dialog"),
-            title: new Text("Alle Artikel als erledigt markieren?"),
-            actions: <Widget>[
-              new FlatButton(
-                  key: Key("confirm"),
-                  onPressed: () {
-                    _completeAllItems();
-                    Navigator.of(context).pop();
-                  },
-                  child: new Text('Ja')
-              ),
-              new FlatButton(
-                  key: Key("deny"),
-                  onPressed: Navigator.of(context).pop,
-                  child: new Text('Nein')
-              )
-            ],
-          );
-        }
-    );
-  }
-
   void _showDialogForDeletingCompletedItems(BuildContext context) {
      showDialog(
         context: context,
         builder: (BuildContext buildContext) {
-          return AlertDialog(
-            key: Key("delete_completed_dialog"),
-            title: new Text("Alle erledigten Artikel löschen?"),
-            actions: <Widget>[
-              new FlatButton(
-                  key: Key("confirm"),
-                  onPressed: () {
-                    _clearCompletedItems();
-                    Navigator.of(context).pop();
-                  },
-                  child: new Text('Ja')
-              ),
-              new FlatButton(
-                  key: Key("deny"),
-                  onPressed: Navigator.of(context).pop,
-                  child: new Text('Nein')
-              )
-            ],
-          );
+          return showAlertDialog(context, "Alle erledigten Artikel löschen?", _clearCompletedItems);
         }
     );
   }
@@ -212,32 +180,37 @@ class _ShoppingListState extends State<ShoppingList> {
      showDialog(
         context: context,
         builder: (BuildContext buildContext) {
-          return AlertDialog(
-            key: Key("delete_all_dialog"),
-            title: new Text("Liste leeren?"),
-            actions: <Widget>[
-              new FlatButton(
-                  key: Key("confirm"),
-                  onPressed: () {
-                    _clearAllItems();
-                    Navigator.of(context).pop();
-                  },
-                  child: new Text('Ja')
-              ),
-              new FlatButton(
-                  key: Key("deny"),
-                  onPressed: Navigator.of(context).pop,
-                  child: new Text('Nein')
-              )
-            ],
-          );
+          return showAlertDialog(context, "Liste leeren?", _clearAllItems);
         }
+    );
+  }
+
+  AlertDialog showAlertDialog(BuildContext context, String dialogTitle, Function() methodToCall) {
+    return AlertDialog(
+          key: Key("delete_all_dialog"),
+      title: new Text(dialogTitle),
+      actions: <Widget>[
+        new FlatButton(
+            key: Key("confirm"),
+            onPressed: () {
+              methodToCall();
+              Navigator.of(context).pop();
+            },
+            child: new Text('Ja')
+        ),
+        new FlatButton(
+            key: Key("deny"),
+            onPressed: Navigator.of(context).pop,
+            child: new Text('Nein')
+        )
+      ],
     );
   }
 
   Widget buildList() {
     return new ListView.builder(
         itemCount: _itemList.length,
+        itemExtent: _itemExtent,
         itemBuilder: (context, index) {
           return buildListItem(index, _itemList[index].text);
         });
@@ -247,15 +220,20 @@ class _ShoppingListState extends State<ShoppingList> {
     return new ListTile(
         title: new Text(
             text,
-            style: TextStyle(
-                color: _itemList[itemIndex].isChecked ? Colors.black12 : Colors.black,
+            style: GoogleFonts.caveat(
+                textStyle: TextStyle(
+                color: _itemList[itemIndex].isChecked ? Colors.black26 : Colors.black,
                 fontSize: _fontSize,
-                decoration: _itemList[itemIndex].isChecked ? TextDecoration.lineThrough : TextDecoration.none)),
-        tileColor: Colors.black12,
+                decoration: _itemList[itemIndex].isChecked ? TextDecoration.lineThrough : TextDecoration.none))
+            ),
+        tileColor: Colors.transparent,
         onTap: () => setState(() {
           _itemList[itemIndex].isChecked = !_itemList[itemIndex].isChecked;
           _saveData();
-        })
+        }),
+      onLongPress: () => setState((){
+        // TODO
+      }),
     );
   }
 
@@ -270,9 +248,9 @@ class _ShoppingListState extends State<ShoppingList> {
       // workaround because SharedPreferences can only store Lists of type String
       // https://stackoverflow.com/questions/62194868/how-to-add-a-list-with-widgets-to-shared-preferences-in-flutter
       String storedItems = prefs.getString("itemList");
-      if(storedItems?.isEmpty ?? true) return <ListItem>[];
+      if(storedItems?.isEmpty ?? true) return <ShoppingItem>[];
       final items = json.decode(storedItems) as List;
-      _itemList = List<ListItem>.from(items.map((x) => ListItem.fromJson(x)));
+      _itemList = List<ShoppingItem>.from(items.map((x) => ShoppingItem.fromJson(x)));
     });
   }
 }
