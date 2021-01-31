@@ -95,6 +95,7 @@ class _ShoppingListState extends State<ShoppingList> {
           // ),
           IconButton(
               key: Key("delete_completed"),
+              color: Colors.redAccent,
               icon: Icon(Icons.remove_done),
               onPressed: () => _itemList.where((item) => item.isChecked).length > 0
                   ? _showDialogForDeletingCompletedItems(context)
@@ -229,7 +230,10 @@ class _ShoppingListState extends State<ShoppingList> {
         onTap: () => setState(() {
           _itemList[itemIndex].isChecked = !_itemList[itemIndex].isChecked;
           _saveData();
-        })
+        }),
+      onLongPress: () => setState((){
+        // TODO
+      }),
     );
   }
 
