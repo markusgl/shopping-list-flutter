@@ -5,23 +5,23 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:shopping_list/shoppingitem.dart';
 
-import 'listitem.dart';
 
-class ShoppingList extends StatefulWidget {
-  ShoppingList({Key key, this.title}) : super(key: key);
+class ShoppeyApp extends StatefulWidget {
+  ShoppeyApp({Key key, this.title}) : super(key: key);
   final String title;
 
   @override
-  _ShoppingListState createState() => _ShoppingListState();
+  _ShoppeyAppState createState() => _ShoppeyAppState();
 }
 
-class _ShoppingListState extends State<ShoppingList> {
+class _ShoppeyAppState extends State<ShoppeyApp> {
   static const double _SMALL_FONT_SIZE = 28;
   static const double _LARGE_FONT_SIZE = 40;
   static const double _SMALL_ITEM_EXTENT = 35;
   static const double _LARGE_ITEM_EXTENT = 50;
-  List<ListItem> _itemList = [];
+  List<ShoppingItem> _itemList = [];
   TextEditingController inputController = new TextEditingController();
   double _fontSize = _LARGE_FONT_SIZE;
   double _itemExtent = _LARGE_ITEM_EXTENT;
@@ -34,7 +34,7 @@ class _ShoppingListState extends State<ShoppingList> {
 
   void _addItem() {
     String userInput = inputController.text;
-    ListItem listItem = new ListItem(inputController.text, false);
+    ShoppingItem listItem = new ShoppingItem(inputController.text, false);
 
     if (userInput.length > 0) {
       setState(() {
@@ -248,9 +248,9 @@ class _ShoppingListState extends State<ShoppingList> {
       // workaround because SharedPreferences can only store Lists of type String
       // https://stackoverflow.com/questions/62194868/how-to-add-a-list-with-widgets-to-shared-preferences-in-flutter
       String storedItems = prefs.getString("itemList");
-      if(storedItems?.isEmpty ?? true) return <ListItem>[];
+      if(storedItems?.isEmpty ?? true) return <ShoppingItem>[];
       final items = json.decode(storedItems) as List;
-      _itemList = List<ListItem>.from(items.map((x) => ListItem.fromJson(x)));
+      _itemList = List<ShoppingItem>.from(items.map((x) => ShoppingItem.fromJson(x)));
     });
   }
 }

@@ -1,7 +1,7 @@
-class ListItem {
+class ShoppingItem {
   String text;
   bool isChecked;
-  ListItem(this.text, this.isChecked);
+  ShoppingItem(this.text, this.isChecked);
 
   @override
   toString() {
@@ -11,6 +11,6 @@ class ListItem {
   Map<String, dynamic> toJson() => {
     'text': this.text, 'isChecked': this.isChecked
   };
-  factory ListItem.fromJson(Map<String, dynamic> listItem) =>
-      ListItem(listItem['text'], listItem['isChecked']);
+  factory ShoppingItem.fromJson(Map<String, dynamic> listItem) =>
+      ShoppingItem(listItem['text'], listItem['isChecked']);
 }
