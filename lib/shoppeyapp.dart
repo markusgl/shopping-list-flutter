@@ -46,7 +46,7 @@ class _ShoppeyAppState extends State<ShoppeyApp> {
       });
       _saveData();
     } else {
-      Fluttertoast.showToast(msg: "Keinen Artikel angegeben");
+      Fluttertoast.showToast(msg: "Bitte Artikel angeben");
     }
   }
 
@@ -102,14 +102,7 @@ class _ShoppeyAppState extends State<ShoppeyApp> {
           )
         ],
       ),
-      body: Stack(
-        fit: StackFit.loose,
-        children: <Widget>[
-          Container(
-            child: buildReorderableList(),
-          )
-        ],
-      ),
+      body: buildReorderableList(),
       floatingActionButton: FloatingActionButton(
         backgroundColor: Color.fromARGB(255, 85, 196, 180),
         onPressed: () =>  showDialogForAddingItems(context),
@@ -262,15 +255,6 @@ class _ShoppeyAppState extends State<ShoppeyApp> {
     _itemList.insert(newIndex, item);
   }
 
-  // Widget buildList() {
-  //   return new ListView.builder(
-  //       itemCount: _itemList.length,
-  //       itemExtent: _itemExtent,
-  //       itemBuilder: (context, index) {
-  //         return buildListItem(_itemList[index]);
-  //       });
-  // }
-
   Widget buildListItem(ShoppingItem item) {
     return new ListTile(
       key: ValueKey(item),
@@ -287,11 +271,11 @@ class _ShoppeyAppState extends State<ShoppeyApp> {
         item.isChecked = !item.isChecked;
         _saveData();
       }),
-      trailing: IconButton(
-        icon: Icon(Icons.edit_outlined),
-        onPressed: () => showDialogForEditingItems(context, item),
+      trailing:
+        IconButton(
+          icon: Icon(Icons.edit_outlined),
+          onPressed: () => showDialogForEditingItems(context, item),
       )
-      // onLongPress: () => showDialogForEditingItems(context, item),
     );
   }
 
