@@ -19,12 +19,15 @@ class ShoppeyApp extends StatefulWidget {
 class _ShoppeyAppState extends State<ShoppeyApp> {
   static const double _SMALL_FONT_SIZE = 28;
   static const double _LARGE_FONT_SIZE = 40;
-  static const double _SMALL_ITEM_EXTENT = 35;
-  static const double _LARGE_ITEM_EXTENT = 50;
-  List<ShoppingItem> _itemList = [];
-  TextEditingController inputController = new TextEditingController();
+
+  static const double _SMALL_ITEM_EXTENT = 5;
+  static const double _LARGE_ITEM_EXTENT = 35;
+
   double _fontSize = _LARGE_FONT_SIZE;
   double _itemExtent = _LARGE_ITEM_EXTENT;
+
+  List<ShoppingItem> _itemList = [];
+  TextEditingController inputController = new TextEditingController();
 
   @override
   void initState() {
@@ -259,31 +262,35 @@ class _ShoppeyAppState extends State<ShoppeyApp> {
     _itemList.insert(newIndex, item);
   }
 
-  Widget buildList() {
-    return new ListView.builder(
-        itemCount: _itemList.length,
-        itemExtent: _itemExtent,
-        itemBuilder: (context, index) {
-          return buildListItem(_itemList[index]);
-        });
-  }
+  // Widget buildList() {
+  //   return new ListView.builder(
+  //       itemCount: _itemList.length,
+  //       itemExtent: _itemExtent,
+  //       itemBuilder: (context, index) {
+  //         return buildListItem(_itemList[index]);
+  //       });
+  // }
 
   Widget buildListItem(ShoppingItem item) {
     return new ListTile(
-        key: ValueKey(item),
-        title: new Text(
-            item.text,
-            style: GoogleFonts.caveat(
-                textStyle: TextStyle(
-                color: item.isChecked ? Colors.black26 : Colors.black,
-                fontSize: _fontSize,
-                decoration: item.isChecked ? TextDecoration.lineThrough : TextDecoration.none))
-            ),
-        tileColor: Colors.transparent,
-        onTap: () => setState(() {
-          item.isChecked = !item.isChecked;
-          _saveData();
-        }),
+      key: ValueKey(item),
+      title: new Text(
+          item.text,
+          style: GoogleFonts.caveat(
+              textStyle: TextStyle(
+              color: item.isChecked ? Colors.black26 : Colors.black,
+              fontSize: _fontSize,
+              decoration: item.isChecked ? TextDecoration.lineThrough : TextDecoration.none))
+          ),
+      tileColor: Colors.transparent,
+      onTap: () => setState(() {
+        item.isChecked = !item.isChecked;
+        _saveData();
+      }),
+      trailing: IconButton(
+        icon: Icon(Icons.edit_outlined),
+        onPressed: () => showDialogForEditingItems(context, item),
+      )
       // onLongPress: () => showDialogForEditingItems(context, item),
     );
   }
