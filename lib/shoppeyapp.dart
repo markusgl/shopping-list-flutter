@@ -103,7 +103,7 @@ class _ShoppeyAppState extends State<ShoppeyApp> {
         fit: StackFit.loose,
         children: <Widget>[
           Container(
-            child: buildList(),
+            child: buildReorderableList(),
           )
         ],
       ),
@@ -155,7 +155,7 @@ class _ShoppeyAppState extends State<ShoppeyApp> {
         });
   }
 
-  void showDialogForEditingItems(BuildContext context, ShoppingItem item, int index) {
+  void showDialogForEditingItems(BuildContext context, ShoppingItem item) {
     inputController.text = item.text;
     showDialog(
         context: context,
@@ -168,7 +168,7 @@ class _ShoppeyAppState extends State<ShoppeyApp> {
                       // controller: new TextEditingController(text: item.text),
                       controller: inputController,
                       autofocus: true,
-                      onSubmitted: (dynamic x) => {_editItem(item, index), Navigator.of(context).pop()},
+                      onSubmitted: (dynamic x) => {_editItem(item), Navigator.of(context).pop()},
                       decoration: InputDecoration(
                           labelText: "Artikel eingeben",
                           hintText: "z. B. Bananen"),
@@ -188,7 +188,7 @@ class _ShoppeyAppState extends State<ShoppeyApp> {
                 child: new Text("Speichern"),
                 textColor: Color.fromARGB(255, 85, 196, 180),
                 onPressed: () {
-                  _editItem(item, index);
+                  _editItem(item);
                   Navigator.of(context).pop();
                 },
               )
@@ -237,35 +237,58 @@ class _ShoppeyAppState extends State<ShoppeyApp> {
     );
   }
 
+  Widget buildReorderableList() {
+    return new ReorderableListView(
+        children: [
+          for (final item in _itemList)
+            buildListItem(item)
+        ],
+        onReorder: (oldIndex, newIndex) {
+          setState(() {
+            _reorderList(oldIndex, newIndex);
+          });
+        }
+    );
+  }
+
+  void _reorderList(int oldIndex, int newIndex) {
+    if (newIndex > oldIndex) {
+      newIndex -=1;
+    }
+    final item = _itemList.removeAt(oldIndex);
+    _itemList.insert(newIndex, item);
+  }
+
   Widget buildList() {
     return new ListView.builder(
         itemCount: _itemList.length,
         itemExtent: _itemExtent,
         itemBuilder: (context, index) {
-          return buildListItem(index, _itemList[index].text);
+          return buildListItem(_itemList[index]);
         });
   }
 
-  Widget buildListItem(int itemIndex, String text) {
+  Widget buildListItem(ShoppingItem item) {
     return new ListTile(
+        key: ValueKey(item),
         title: new Text(
-            text,
+            item.text,
             style: GoogleFonts.caveat(
                 textStyle: TextStyle(
-                color: _itemList[itemIndex].isChecked ? Colors.black26 : Colors.black,
+                color: item.isChecked ? Colors.black26 : Colors.black,
                 fontSize: _fontSize,
-                decoration: _itemList[itemIndex].isChecked ? TextDecoration.lineThrough : TextDecoration.none))
+                decoration: item.isChecked ? TextDecoration.lineThrough : TextDecoration.none))
             ),
         tileColor: Colors.transparent,
         onTap: () => setState(() {
-          _itemList[itemIndex].isChecked = !_itemList[itemIndex].isChecked;
+          item.isChecked = !item.isChecked;
           _saveData();
         }),
-      onLongPress: () => showDialogForEditingItems(context, _itemList[itemIndex], itemIndex),
+      // onLongPress: () => showDialogForEditingItems(context, item),
     );
   }
 
-  void _editItem(ShoppingItem item, int index) async {
+  void _editItem(ShoppingItem item) async {
     String userInput = inputController.text;
 
     if (userInput.length > 0) {
