@@ -16,15 +16,7 @@ class ShoppeyApp extends StatefulWidget {
 }
 
 class _ShoppeyAppState extends State<ShoppeyApp> {
-  static const double _SMALL_FONT_SIZE = 28;
-  static const double _LARGE_FONT_SIZE = 40;
-
-  static const double _SMALL_ITEM_EXTENT = 5;
-  static const double _LARGE_ITEM_EXTENT = 35;
-
-  double _fontSize = _LARGE_FONT_SIZE;
-  double _itemExtent = _LARGE_ITEM_EXTENT;
-
+  double _fontSize = 38;
   List<ShoppingItem> _itemList = [];
   TextEditingController inputController = new TextEditingController();
 
@@ -81,20 +73,8 @@ class _ShoppeyAppState extends State<ShoppeyApp> {
             // backgroundColor: Colors.lightGreen,
             actions: <Widget>[
               IconButton(
-                key: Key("font_size"),
-                icon: Icon(Icons.format_size),
-                onPressed: () => setState(() {
-                  _fontSize == _LARGE_FONT_SIZE
-                      ? _fontSize = _SMALL_FONT_SIZE
-                      : _fontSize = _LARGE_FONT_SIZE;
-                  _itemExtent == _LARGE_ITEM_EXTENT
-                      ? _itemExtent = _SMALL_ITEM_EXTENT
-                      : _itemExtent = _LARGE_ITEM_EXTENT;
-                }),
-              ),
-              IconButton(
                 key: Key("delete_completed"),
-                color: Colors.redAccent,
+                color: Colors.white,
                 icon: Icon(Icons.remove_done),
                 onPressed: () =>
                     _itemList.where((item) => item.isChecked).length > 0
@@ -104,7 +84,7 @@ class _ShoppeyAppState extends State<ShoppeyApp> {
               ),
               IconButton(
                 key: Key("delete_all"),
-                color: Colors.redAccent,
+                color: Colors.white,
                 icon: Icon(Icons.delete_forever_outlined),
                 onPressed: () => _itemList.length > 0
                     ? _showAlertDialogForDeletingAllItems(context)
@@ -171,7 +151,6 @@ class _ShoppeyAppState extends State<ShoppeyApp> {
               children: <Widget>[
                 new Expanded(
                     child: new TextField(
-                  // controller: new TextEditingController(text: item.text),
                   controller: inputController,
                   autofocus: true,
                   onSubmitted: (dynamic x) =>
@@ -260,31 +239,25 @@ class _ShoppeyAppState extends State<ShoppeyApp> {
   }
 
   Widget buildListItem(ShoppingItem item) {
-    return Container(
-      height: MediaQuery.of(context).size.height / 15, // TODO set responsive height
-      key: ValueKey(item),
-      child: ListTile(
-        // dense: true,
-        //   contentPadding: EdgeInsets.only(top: 0.0),
-          key: ValueKey(item),
-          title: new Text(item.text,
-              style: GoogleFonts.caveat(
-                  textStyle: TextStyle(
-                      color: item.isChecked ? Colors.black26 : Colors.black,
-                      fontSize: _fontSize,
-                      decoration: item.isChecked
-                          ? TextDecoration.lineThrough
-                          : TextDecoration.none))),
-          tileColor: Colors.transparent,
-          onTap: () => setState(() {
-                item.isChecked = !item.isChecked;
-                _saveData();
-              }),
-          trailing: IconButton(
-            icon: Icon(Icons.edit_outlined),
-            onPressed: () => showDialogForEditingItems(context, item),
-          )),
-    );
+    return ListTile(
+        key: ValueKey(item),
+        title: new Text(item.text,
+            style: GoogleFonts.caveat(
+                textStyle: TextStyle(
+                    color: item.isChecked ? Colors.black26 : Colors.black,
+                    fontSize: _fontSize,
+                    decoration: item.isChecked
+                        ? TextDecoration.lineThrough
+                        : TextDecoration.none))),
+        tileColor: Colors.transparent,
+        onTap: () => setState(() {
+              item.isChecked = !item.isChecked;
+              _saveData();
+            }),
+        trailing: IconButton(
+          icon: Icon(Icons.edit_outlined),
+          onPressed: () => showDialogForEditingItems(context, item),
+        ));
   }
 
   void _editItem(ShoppingItem item) async {
