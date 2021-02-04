@@ -7,7 +7,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shopping_list/shoppingitem.dart';
 
-
 class ShoppeyApp extends StatefulWidget {
   ShoppeyApp({Key key, this.title}) : super(key: key);
   final String title;
@@ -17,14 +16,9 @@ class ShoppeyApp extends StatefulWidget {
 }
 
 class _ShoppeyAppState extends State<ShoppeyApp> {
-  static const double _SMALL_FONT_SIZE = 28;
-  static const double _LARGE_FONT_SIZE = 40;
-  static const double _SMALL_ITEM_EXTENT = 35;
-  static const double _LARGE_ITEM_EXTENT = 50;
+  double _fontSize = 38;
   List<ShoppingItem> _itemList = [];
   TextEditingController inputController = new TextEditingController();
-  double _fontSize = _LARGE_FONT_SIZE;
-  double _itemExtent = _LARGE_ITEM_EXTENT;
 
   @override
   void initState() {
@@ -43,12 +37,12 @@ class _ShoppeyAppState extends State<ShoppeyApp> {
       });
       _saveData();
     } else {
-      Fluttertoast.showToast(msg: "Keinen Artikel angegeben");
+      Fluttertoast.showToast(msg: "Bitte Artikel angeben");
     }
   }
 
   void _clearCompletedItems() {
-    if (_itemList.where((item) => item.isChecked).length > 0){
+    if (_itemList.where((item) => item.isChecked).length > 0) {
       setState(() {
         _itemList.removeWhere((item) => item.isChecked);
       });
@@ -67,52 +61,44 @@ class _ShoppeyAppState extends State<ShoppeyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(decoration: BoxDecoration(image: DecorationImage(image: new AssetImage("images/ruled_paper.png"), fit: BoxFit.cover)),child: Scaffold(
-      backgroundColor: Colors.transparent,
-      appBar: AppBar(
-        title: Text(widget.title),
-        // backgroundColor: Colors.lightGreen,
-        actions: <Widget>[
-          IconButton(
-            key: Key("font_size"),
-            icon: Icon(Icons.format_size),
-            onPressed: () => setState(() {
-              _fontSize==_LARGE_FONT_SIZE ? _fontSize=_SMALL_FONT_SIZE : _fontSize=_LARGE_FONT_SIZE;
-              _itemExtent==_LARGE_ITEM_EXTENT ? _itemExtent=_SMALL_ITEM_EXTENT : _itemExtent=_LARGE_ITEM_EXTENT;
-            }),
+    return Container(
+        decoration: BoxDecoration(
+            image: DecorationImage(
+                image: new AssetImage("images/ruled_paper.png"),
+                fit: BoxFit.cover)),
+        child: Scaffold(
+          backgroundColor: Colors.transparent,
+          appBar: AppBar(
+            title: Text(widget.title),
+            // backgroundColor: Colors.lightGreen,
+            actions: <Widget>[
+              IconButton(
+                key: Key("delete_completed"),
+                color: Colors.white,
+                icon: Icon(Icons.remove_done),
+                onPressed: () =>
+                    _itemList.where((item) => item.isChecked).length > 0
+                        ? _showDialogForDeletingCompletedItems(context)
+                        : Fluttertoast.showToast(
+                            msg: "Keine erledigten Artikel vorhanden"),
+              ),
+              IconButton(
+                key: Key("delete_all"),
+                color: Colors.white,
+                icon: Icon(Icons.delete_forever_outlined),
+                onPressed: () => _itemList.length > 0
+                    ? _showAlertDialogForDeletingAllItems(context)
+                    : Fluttertoast.showToast(msg: "Keine Artikel vorhanden"),
+              )
+            ],
           ),
-          IconButton(
-              key: Key("delete_completed"),
-              color: Colors.redAccent,
-              icon: Icon(Icons.remove_done),
-              onPressed: () => _itemList.where((item) => item.isChecked).length > 0
-                  ? _showDialogForDeletingCompletedItems(context)
-                  : Fluttertoast.showToast(msg: "Keine erledigten Artikel vorhanden"),
-          ),
-          IconButton(
-              key: Key("delete_all"),
-              color: Colors.redAccent,
-              icon: Icon(Icons.delete_forever_outlined),
-              onPressed: () => _itemList.length > 0
-                  ? _showAlertDialogForDeletingAllItems(context)
-                  : Fluttertoast.showToast(msg: "Keine Artikel vorhanden"),
-          )
-        ],
-      ),
-      body: Stack(
-        fit: StackFit.loose,
-        children: <Widget>[
-          Container(
-            child: buildList(),
-          )
-        ],
-      ),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: Color.fromARGB(255, 85, 196, 180),
-        onPressed: () =>  showDialogForAddingItems(context),
-        child: Icon(Icons.add, color: Colors.white),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
-    ));
+          body: buildReorderableList(),
+          floatingActionButton: FloatingActionButton(
+            backgroundColor: Color.fromARGB(255, 85, 196, 180),
+            onPressed: () => showDialogForAddingItems(context),
+            child: Icon(Icons.add, color: Colors.white),
+          ), // This trailing comma makes auto-formatting nicer for build methods.
+        ));
   }
 
   void showDialogForAddingItems(BuildContext context) {
@@ -124,13 +110,13 @@ class _ShoppeyAppState extends State<ShoppeyApp> {
               children: <Widget>[
                 new Expanded(
                     child: new TextField(
-                      controller: inputController,
-                      autofocus: true,
-                      onSubmitted: (dynamic x) => {_addItem(), Navigator.of(context).pop()},
-                      decoration: InputDecoration(
-                          labelText: "Artikel eingeben",
-                          hintText: "z. B. Bananen"),
-                    ))
+                  controller: inputController,
+                  autofocus: true,
+                  onSubmitted: (dynamic x) =>
+                      {_addItem(), Navigator.of(context).pop()},
+                  decoration: InputDecoration(
+                      labelText: "Artikel eingeben", hintText: "z. B. Bananen"),
+                ))
               ],
             ),
             actions: <Widget>[
@@ -155,7 +141,7 @@ class _ShoppeyAppState extends State<ShoppeyApp> {
         });
   }
 
-  void showDialogForEditingItems(BuildContext context, ShoppingItem item, int index) {
+  void showDialogForEditingItems(BuildContext context, ShoppingItem item) {
     inputController.text = item.text;
     showDialog(
         context: context,
@@ -165,14 +151,13 @@ class _ShoppeyAppState extends State<ShoppeyApp> {
               children: <Widget>[
                 new Expanded(
                     child: new TextField(
-                      // controller: new TextEditingController(text: item.text),
-                      controller: inputController,
-                      autofocus: true,
-                      onSubmitted: (dynamic x) => {_editItem(item, index), Navigator.of(context).pop()},
-                      decoration: InputDecoration(
-                          labelText: "Artikel eingeben",
-                          hintText: "z. B. Bananen"),
-                    ))
+                  controller: inputController,
+                  autofocus: true,
+                  onSubmitted: (dynamic x) =>
+                      {_editItem(item), Navigator.of(context).pop()},
+                  decoration: InputDecoration(
+                      labelText: "Artikel eingeben", hintText: "z. B. Bananen"),
+                ))
               ],
             ),
             actions: <Widget>[
@@ -188,7 +173,7 @@ class _ShoppeyAppState extends State<ShoppeyApp> {
                 child: new Text("Speichern"),
                 textColor: Color.fromARGB(255, 85, 196, 180),
                 onPressed: () {
-                  _editItem(item, index);
+                  _editItem(item);
                   Navigator.of(context).pop();
                 },
               )
@@ -198,26 +183,26 @@ class _ShoppeyAppState extends State<ShoppeyApp> {
   }
 
   void _showDialogForDeletingCompletedItems(BuildContext context) {
-     showDialog(
+    showDialog(
         context: context,
         builder: (BuildContext buildContext) {
-          return showAlertDialog(context, "Alle erledigten Artikel löschen?", _clearCompletedItems);
-        }
-    );
+          return showAlertDialog(context, "Alle erledigten Artikel löschen?",
+              _clearCompletedItems);
+        });
   }
 
   void _showAlertDialogForDeletingAllItems(BuildContext context) {
-     showDialog(
+    showDialog(
         context: context,
         builder: (BuildContext buildContext) {
           return showAlertDialog(context, "Liste leeren?", _clearAllItems);
-        }
-    );
+        });
   }
 
-  AlertDialog showAlertDialog(BuildContext context, String dialogTitle, Function() methodToCall) {
+  AlertDialog showAlertDialog(
+      BuildContext context, String dialogTitle, Function() methodToCall) {
     return AlertDialog(
-          key: Key("delete_all_dialog"),
+      key: Key("delete_all_dialog"),
       title: new Text(dialogTitle),
       actions: <Widget>[
         new FlatButton(
@@ -226,46 +211,56 @@ class _ShoppeyAppState extends State<ShoppeyApp> {
               methodToCall();
               Navigator.of(context).pop();
             },
-            child: new Text('Ja')
-        ),
+            child: new Text('Ja')),
         new FlatButton(
             key: Key("deny"),
             onPressed: Navigator.of(context).pop,
-            child: new Text('Nein')
-        )
+            child: new Text('Nein'))
       ],
     );
   }
 
-  Widget buildList() {
-    return new ListView.builder(
-        itemCount: _itemList.length,
-        itemExtent: _itemExtent,
-        itemBuilder: (context, index) {
-          return buildListItem(index, _itemList[index].text);
+  Widget buildReorderableList() {
+    return new ReorderableListView(
+        children: [for (final item in _itemList) buildListItem(item)],
+        onReorder: (oldIndex, newIndex) {
+          setState(() {
+            _reorderList(oldIndex, newIndex);
+          });
         });
   }
 
-  Widget buildListItem(int itemIndex, String text) {
-    return new ListTile(
-        title: new Text(
-            text,
-            style: GoogleFonts.caveat(
-                textStyle: TextStyle(
-                color: _itemList[itemIndex].isChecked ? Colors.black26 : Colors.black,
-                fontSize: _fontSize,
-                decoration: _itemList[itemIndex].isChecked ? TextDecoration.lineThrough : TextDecoration.none))
-            ),
-        tileColor: Colors.transparent,
-        onTap: () => setState(() {
-          _itemList[itemIndex].isChecked = !_itemList[itemIndex].isChecked;
-          _saveData();
-        }),
-      onLongPress: () => showDialogForEditingItems(context, _itemList[itemIndex], itemIndex),
-    );
+  void _reorderList(int oldIndex, int newIndex) {
+    if (newIndex > oldIndex) {
+      newIndex -= 1;
+    }
+    final item = _itemList.removeAt(oldIndex);
+    _itemList.insert(newIndex, item);
   }
 
-  void _editItem(ShoppingItem item, int index) async {
+  Widget buildListItem(ShoppingItem item) {
+    return ListTile(
+        key: ValueKey(item),
+        title: new Text(item.text,
+            style: GoogleFonts.caveat(
+                textStyle: TextStyle(
+                    color: item.isChecked ? Colors.black26 : Colors.black,
+                    fontSize: _fontSize,
+                    decoration: item.isChecked
+                        ? TextDecoration.lineThrough
+                        : TextDecoration.none))),
+        tileColor: Colors.transparent,
+        onTap: () => setState(() {
+              item.isChecked = !item.isChecked;
+              _saveData();
+            }),
+        trailing: IconButton(
+          icon: Icon(Icons.edit_outlined),
+          onPressed: () => showDialogForEditingItems(context, item),
+        ));
+  }
+
+  void _editItem(ShoppingItem item) async {
     String userInput = inputController.text;
 
     if (userInput.length > 0) {
@@ -290,9 +285,10 @@ class _ShoppeyAppState extends State<ShoppeyApp> {
       // workaround because SharedPreferences can only store Lists of type String
       // https://stackoverflow.com/questions/62194868/how-to-add-a-list-with-widgets-to-shared-preferences-in-flutter
       String storedItems = prefs.getString("itemList");
-      if(storedItems?.isEmpty ?? true) return <ShoppingItem>[];
+      if (storedItems?.isEmpty ?? true) return <ShoppingItem>[];
       final items = json.decode(storedItems) as List;
-      _itemList = List<ShoppingItem>.from(items.map((x) => ShoppingItem.fromJson(x)));
+      _itemList =
+          List<ShoppingItem>.from(items.map((x) => ShoppingItem.fromJson(x)));
     });
   }
 }
