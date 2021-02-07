@@ -239,25 +239,33 @@ class _ShoppeyAppState extends State<ShoppeyApp> {
   }
 
   Widget buildListItem(ShoppingItem item) {
-    return ListTile(
+    return Dismissible(
         key: ValueKey(item),
-        title: new Text(item.text,
-            style: GoogleFonts.caveat(
-                textStyle: TextStyle(
-                    color: item.isChecked ? Colors.black26 : Colors.black,
-                    fontSize: _fontSize,
-                    decoration: item.isChecked
-                        ? TextDecoration.lineThrough
-                        : TextDecoration.none))),
-        tileColor: Colors.transparent,
-        onTap: () => setState(() {
-              item.isChecked = !item.isChecked;
-              _saveData();
-            }),
-        trailing: IconButton(
-          icon: Icon(Icons.edit_outlined),
-          onPressed: () => showDialogForEditingItems(context, item),
-        ));
+        onDismissed: (direction) {
+          setState(() {
+            int index = _itemList.indexOf(item);
+            _itemList.removeAt(index);
+          });
+        },
+        background: Container(color: Colors.redAccent),
+        child: ListTile(
+            title: new Text(item.text,
+                style: GoogleFonts.caveat(
+                    textStyle: TextStyle(
+                        color: item.isChecked ? Colors.black26 : Colors.black,
+                        fontSize: _fontSize,
+                        decoration: item.isChecked
+                            ? TextDecoration.lineThrough
+                            : TextDecoration.none))),
+            tileColor: Colors.transparent,
+            onTap: () => setState(() {
+                  item.isChecked = !item.isChecked;
+                  _saveData();
+                }),
+            trailing: IconButton(
+              icon: Icon(Icons.edit_outlined),
+              onPressed: () => showDialogForEditingItems(context, item),
+            )));
   }
 
   void _editItem(ShoppingItem item) async {
