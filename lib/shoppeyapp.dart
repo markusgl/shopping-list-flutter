@@ -236,6 +236,7 @@ class _ShoppeyAppState extends State<ShoppeyApp> {
     }
     final item = _itemList.removeAt(oldIndex);
     _itemList.insert(newIndex, item);
+    _saveData();
   }
 
   Widget buildListItem(ShoppingItem item) {
