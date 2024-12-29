@@ -9,7 +9,7 @@ void main() {
 class Home extends StatelessWidget {
   // This widget is the root of your application.
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context)   {
     return MaterialApp(
       title: 'Shoppey',
       theme: ThemeData(
@@ -19,7 +19,7 @@ class Home extends StatelessWidget {
           color: Colors.white // Icons in heading color
         ),
         primaryTextTheme: TextTheme(
-          headline6: TextStyle(
+          headlineMedium: TextStyle(
             fontFamily: GoogleFonts.caveat().fontFamily,
             fontSize: 36,
             // fontWeight: FontWeight.bold,
@@ -29,7 +29,7 @@ class Home extends StatelessWidget {
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       home: ShoppeyApp(
-          title: 'Shoppey'
+        key: Key('123'),
       ),
     );
   }

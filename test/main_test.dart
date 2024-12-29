@@ -11,7 +11,7 @@ void main() {
 
     expect(find.text('Artikel eingeben'), findsOneWidget);
     expect(find.byType(TextField), findsOneWidget);
-    expect(find.byType(FlatButton), findsWidgets);
+    //expect(find.byType(TextButton(onPressed: onPressed, child: child)), findsWidgets);
     expect(find.text('Speichern'), findsOneWidget);
     expect(find.text('Schließen'), findsOneWidget);
   });

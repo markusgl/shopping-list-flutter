@@ -8,8 +8,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shopping_list/shoppingitem.dart';
 
 class ShoppeyApp extends StatefulWidget {
-  ShoppeyApp({Key key, this.title}) : super(key: key);
-  final String title;
+  final String title = 'Shoppey';
+
+  ShoppeyApp({required Key key}) : super(key: key);
 
   @override
   _ShoppeyAppState createState() => _ShoppeyAppState();
@@ -27,8 +28,8 @@ class _ShoppeyAppState extends State<ShoppeyApp> {
   }
 
   void _addItem() {
-    String userInput = inputController.text;
-    ShoppingItem listItem = new ShoppingItem(inputController.text, false);
+    String userInput = inputController.text ?? "";
+    ShoppingItem listItem = new ShoppingItem(text: userInput, isChecked: false);
 
     if (userInput.length > 0) {
       setState(() {
@@ -61,6 +62,8 @@ class _ShoppeyAppState extends State<ShoppeyApp> {
 
   @override
   Widget build(BuildContext context) {
+    String widgetTitel = 'shoppey';
+
     return Container(
         decoration: BoxDecoration(
             image: DecorationImage(
@@ -69,7 +72,7 @@ class _ShoppeyAppState extends State<ShoppeyApp> {
         child: Scaffold(
           backgroundColor: Colors.transparent,
           appBar: AppBar(
-            title: Text(widget.title),
+            title: Text(widgetTitel),
             // backgroundColor: Colors.lightGreen,
             actions: <Widget>[
               IconButton(
@@ -120,17 +123,21 @@ class _ShoppeyAppState extends State<ShoppeyApp> {
               ],
             ),
             actions: <Widget>[
-              new FlatButton(
+              new TextButton(
                   key: Key("close_dialog"),
                   child: new Text("Schließen"),
-                  textColor: Color.fromARGB(255, 85, 196, 180),
+                  style: TextButton.styleFrom(
+                    backgroundColor: Color.fromARGB(255, 85, 196, 180)
+                  ),
                   onPressed: () {
                     Navigator.of(context).pop();
                   }),
-              new FlatButton(
+              new TextButton(
                 key: Key("save_item"),
                 child: new Text("Speichern"),
-                textColor: Color.fromARGB(255, 85, 196, 180),
+                style: TextButton.styleFrom(
+                  backgroundColor: Color.fromARGB(255, 85, 196, 180)
+                ),
                 onPressed: () {
                   _addItem();
                   Navigator.of(context).pop();
@@ -161,17 +168,21 @@ class _ShoppeyAppState extends State<ShoppeyApp> {
               ],
             ),
             actions: <Widget>[
-              new FlatButton(
+              new TextButton(
                   key: Key("close_dialog"),
                   child: new Text("Schließen"),
-                  textColor: Color.fromARGB(255, 85, 196, 180),
+                  style: TextButton.styleFrom(
+                    backgroundColor: Color.fromARGB(255, 85, 196, 180)
+                  ),
                   onPressed: () {
                     Navigator.of(context).pop();
                   }),
-              new FlatButton(
+              new TextButton(
                 key: Key("save_item"),
                 child: new Text("Speichern"),
-                textColor: Color.fromARGB(255, 85, 196, 180),
+                style: TextButton.styleFrom(
+                  backgroundColor: Color.fromARGB(255, 85, 196, 180)
+                ),
                 onPressed: () {
                   _editItem(item);
                   Navigator.of(context).pop();
@@ -205,14 +216,14 @@ class _ShoppeyAppState extends State<ShoppeyApp> {
       key: Key("delete_all_dialog"),
       title: new Text(dialogTitle),
       actions: <Widget>[
-        new FlatButton(
+        new TextButton(
             key: Key("confirm"),
             onPressed: () {
               methodToCall();
               Navigator.of(context).pop();
             },
             child: new Text('Ja')),
-        new FlatButton(
+        new TextButton(
             key: Key("deny"),
             onPressed: Navigator.of(context).pop,
             child: new Text('Nein'))
@@ -244,7 +255,9 @@ class _ShoppeyAppState extends State<ShoppeyApp> {
         onDismissed: (direction) {
           setState(() {
             int index = _itemList.indexOf(item);
-            _itemList.removeAt(index);
+            if (index != -1) {
+              _itemList.removeAt(index);
+            }
           });
         },
         background: Container(color: Colors.redAccent),
@@ -273,7 +286,10 @@ class _ShoppeyAppState extends State<ShoppeyApp> {
 
     if (userInput.length > 0) {
       setState(() {
-        item.text = userInput;
+        int index = _itemList.indexOf(item);
+        if (index != -1) {
+          _itemList[index] = item.copyWith(text: userInput);
+        }
         inputController.text = "";
       });
       _saveData();
@@ -292,11 +308,13 @@ class _ShoppeyAppState extends State<ShoppeyApp> {
     setState(() {
       // workaround because SharedPreferences can only store Lists of type String
       // https://stackoverflow.com/questions/62194868/how-to-add-a-list-with-widgets-to-shared-preferences-in-flutter
-      String storedItems = prefs.getString("itemList");
-      if (storedItems?.isEmpty ?? true) return <ShoppingItem>[];
-      final items = json.decode(storedItems) as List;
-      _itemList =
-          List<ShoppingItem>.from(items.map((x) => ShoppingItem.fromJson(x)));
+      String storedItems = prefs.getString("itemList") ?? '';
+      if (storedItems.isEmpty) {
+        _itemList = <ShoppingItem>[];
+      } else {
+        final items = json.decode(storedItems) as List;
+        _itemList = List<ShoppingItem>.from(items.map((x) => ShoppingItem.fromJson(x)));
+      }
     });
   }
 }
